@@ -77,11 +77,11 @@ class TestModels(BaseTest):
                 )
                 self.session.add(ct_assoc)
 
-        gwens_toys_query = self.session.query(CatToyAssociation)
-        gwens_toys_query = gwens_toys_query.filter(CatToyAssociation.cat == gwen)
-        gwens_toys_query = gwens_toys_query.filter(CatToyAssociation.preference_level == 1)
-        gwens_toys_query = gwens_toys_query.all()
+        for toy_association in gwen.cat_toy_associations:
+            self.assertEqual(
+                toy_association.preference_level,
+                gwens_favorite_toys[toy_association.cat_toy.name]
+            )
 
-        for toy_obj in gwens_toys_query:
-            self.assertTrue(toy_obj.cat_toy.name in gwens_favorite_toys)
-            self.assertEqual(toy_obj.preference_level, gwens_favorite_toys[toy_obj.cat_toy.name])
+        for toy in gwen.toys:
+            self.assertTrue(toy.name in gwens_favorite_toys)

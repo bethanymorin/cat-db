@@ -1,15 +1,24 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 from __init__ import Base
 
 
 class CatToyAssociation(Base):
+    """ Table that associates Cats to their favorite CatToys
+        and assigned a preference level
+    """
     __tablename__ = 'cat_toy_association'
-    cat_id = Column(Integer, ForeignKey('cat.id'), primary_key=True)
-    cat_toy_id = Column(Integer, ForeignKey('cat_toy.id'), primary_key=True)
-    preference_level = Column(Integer)
-    cat_toy = relationship("CatToy", back_populates="cats")
-    cat = relationship("Cat", back_populates="toys")
+
+    cat_id = Column(Integer, ForeignKey('cat.id'), primary_key=True)  # foreign key to cat table
+    cat_toy_id = Column(Integer, ForeignKey('cat_toy.id'), primary_key=True)  # foreign key to cat_toy table
+    preference_level = Column(Integer)  # integer value representing cat's preference for the toy
+
+    # relationship manager linking cat toys to their cat associations
+    cat_toy = relationship("CatToy", back_populates="cat_toy_associations")
+
+    # relationship manager linking cats to their cat toy associations
+    cat = relationship("Cat", back_populates="cat_toy_associations")
 
     def __repr__(self):
         return "<CatToyAssociation(cat: %s, toy: %s, preference: %s)>" % (
@@ -21,14 +30,24 @@ class Cat(Base):
     __tablename__ = 'cat'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # properties of a cat
     name = Column(String)
     age = Column(Integer)
     coloring = Column(String)
     gender = Column(String)
-    toys = relationship(
+
+    # relationship manager linking Cat to CatToyAssociation
+    # allows you to call Cat().toy_associations and get back all CatToyAssociation
+    # objects linked to that Cat
+    cat_toy_associations = relationship(
         "CatToyAssociation",
         back_populates='cat'
     )
+
+    # create a proxy from Cat().toys to CatToy() for each CatToyAssociation
+    # linked to this Cat
+    toys = association_proxy('cat_toy_associations', 'cat_toy')
 
     def __repr__(self):
         return "<Cat(%s, %s, %s)>" % (self.name, self.age, self.coloring)
@@ -38,11 +57,21 @@ class CatToy(Base):
     __tablename__ = 'cat_toy'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # properties of a cat toy
     name = Column(String)
-    cats = relationship(
+
+    # relationship manager between CatToys and CatToyAssociation
+    # allows you to call CatToy().cat_associations and get back all CatToyAssociation
+    # objects linked to that toy
+    cat_toy_associations = relationship(
         "CatToyAssociation",
         back_populates='cat_toy'
     )
+
+    # create a proxy from CatToy().cats to Cat() for each CatToyAssociation
+    # linked to this Toy
+    cats = association_proxy('cat_toy_associations', 'cat')
 
     def __repr__(self):
         return "<CatToy('%s')>" % self.name
