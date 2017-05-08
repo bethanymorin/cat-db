@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from __init__ import Base
 from unittest import TestCase
-from models import Cat, CatToy, CatToyAssociation
+from models import Cat, CatToy
 
 
 class BaseTest(TestCase):
@@ -64,25 +64,11 @@ class TestModels(BaseTest):
             new_toy = CatToy(name=toy)
             self.session.add(new_toy)
             if toy in deweys_favorite_toys:
-                ct_assoc = CatToyAssociation(
-                    cat=dewey,
-                    cat_toy=new_toy,
-                    preference_level=deweys_favorite_toys[toy],
-                )
-                self.session.add(ct_assoc)
+                dewey.cat_toy_associations.append(new_toy)
             if toy in gwens_favorite_toys:
-                ct_assoc = CatToyAssociation(
-                    cat=gwen,
-                    cat_toy=new_toy,
-                    preference_level=gwens_favorite_toys[toy],
-                )
-                self.session.add(ct_assoc)
+                gwen.cat_toy_associations.append(new_toy)
 
         for toy_association in gwen.cat_toy_associations:
-            self.assertEqual(
-                toy_association.preference_level,
-                gwens_favorite_toys[toy_association.cat_toy.name]
-            )
-            # we have to take 2 steps to get to information about the cat toy:
-            # toy_association.cat_toy.whatever
-            self.assertTrue(toy_association.cat_toy.name in gwens_favorite_toys)
+            # with this, you can use exactly 1 step tp get from the toy
+            # association object to the toy
+            self.assertTrue(toy_association.name in gwens_favorite_toys)
