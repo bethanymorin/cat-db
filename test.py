@@ -44,6 +44,7 @@ class TestModels(BaseTest):
             'rainbow',
             'carrot',
             'hair tie',
+            'wicker ball',
         ]
 
         gwens_favorite_toys = {
@@ -82,6 +83,6 @@ class TestModels(BaseTest):
                 toy_association.preference_level,
                 gwens_favorite_toys[toy_association.cat_toy.name]
             )
-
-        for toy in gwen.toys:
-            self.assertTrue(toy.name in gwens_favorite_toys)
+            # we have to take 2 steps to get to information about the cat toy:
+            # toy_association.cat_toy.whatever
+            self.assertTrue(toy_association.cat_toy.name in gwens_favorite_toys)

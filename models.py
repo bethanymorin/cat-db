@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.associationproxy import association_proxy
 from __init__ import Base
 
 
@@ -45,10 +44,6 @@ class Cat(Base):
         back_populates='cat'
     )
 
-    # create a proxy from Cat().toys to CatToy() for each CatToyAssociation
-    # linked to this Cat
-    toys = association_proxy('cat_toy_associations', 'cat_toy')
-
     def __repr__(self):
         return "<Cat(%s, %s, %s)>" % (self.name, self.age, self.coloring)
 
@@ -68,10 +63,6 @@ class CatToy(Base):
         "CatToyAssociation",
         back_populates='cat_toy'
     )
-
-    # create a proxy from CatToy().cats to Cat() for each CatToyAssociation
-    # linked to this Toy
-    cats = association_proxy('cat_toy_associations', 'cat')
 
     def __repr__(self):
         return "<CatToy('%s')>" % self.name
