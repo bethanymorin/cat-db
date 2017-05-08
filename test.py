@@ -36,7 +36,6 @@ class TestModels(BaseTest):
         )
 
         self.session.add(dewey)
-        self.session.commit()
         cat_toys = [
             'tunnel',
             'owl',
@@ -63,23 +62,21 @@ class TestModels(BaseTest):
         for toy in cat_toys:
             new_toy = CatToy(name=toy)
             self.session.add(new_toy)
-            self.session.commit()
             if toy in deweys_favorite_toys:
                 ct_assoc = CatToyAssociation(
-                    cat_id=dewey.id,
-                    cat_toy_id=new_toy.id,
+                    cat=dewey,
+                    cat_toy=new_toy,
                     preference_level=deweys_favorite_toys[toy],
                 )
                 self.session.add(ct_assoc)
             if toy in gwens_favorite_toys:
                 ct_assoc = CatToyAssociation(
-                    cat_id=gwen.id,
-                    cat_toy_id=new_toy.id,
+                    cat=gwen,
+                    cat_toy=new_toy,
                     preference_level=gwens_favorite_toys[toy],
                 )
                 self.session.add(ct_assoc)
 
-        self.session.commit()
         gwens_toys_query = self.session.query(CatToyAssociation)
         gwens_toys_query = gwens_toys_query.filter(CatToyAssociation.cat == gwen)
         gwens_toys_query = gwens_toys_query.filter(CatToyAssociation.preference_level == 1)
